@@ -19,4 +19,4 @@ clean:
 
 .PHONY: test
 test:
-	echo "hello world"
+	./JackAnalyzer test/ArrayTest
