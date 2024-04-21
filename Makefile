@@ -15,6 +15,7 @@ zip:
 .PHONY: clean
 clean:
 	rm -f JackAnalyzer;
+	rm -f project10.zip;
 
 .PHONY: test
 test:
