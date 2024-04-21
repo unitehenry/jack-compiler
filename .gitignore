@@ -1,3 +1,4 @@
 JackAnalyzer
 *.sw*
 *.zip
+test/**/*.xml
