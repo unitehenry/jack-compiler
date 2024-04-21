@@ -2,3 +2,4 @@ JackAnalyzer
 *.sw*
 *.zip
 test/**/*.xml
+__pycache__
