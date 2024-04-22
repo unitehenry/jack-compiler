@@ -9,6 +9,7 @@ zip:
 	zip project10.zip \
 		Makefile \
 		JackTokens.py \
+		TokenNavigator.py \
 		CompilationEngine.py \
 		JackTokenizer.py \
 		JackAnalyzer.py

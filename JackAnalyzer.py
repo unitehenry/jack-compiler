@@ -1,7 +1,9 @@
 import sys
 import os
-from JackTokenizer import get_tokens
 from xml.sax.saxutils import escape
+
+from JackTokenizer import get_tokens
+from CompilationEngine import compile_tokens
 
 IN_FILE_EXTENSION = '.jack'
 OUT_FILE_EXTENSION = '.xml'
@@ -25,6 +27,8 @@ def process_file(file_path):
     token_output_path = f'{sys.argv[1]}/{filename}T{OUT_FILE_EXTENSION}'
     token_output_file = open(token_output_path, 'w')
     token_output_file.write(get_token_xml(tokens))
+    compilation = compile_tokens(tokens)
+    print(compilation)
 
 if __name__ == '__main__':
     if os.path.isdir(sys.argv[1]):
