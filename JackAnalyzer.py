@@ -20,6 +20,16 @@ def get_token_xml(tokens):
     xml_string += '</tokens>\n'
     return xml_string
 
+def get_compile_xml(node):
+    xml_string = f'<{node["type"]}>'
+    if isinstance(node['value'], str):
+        xml_string += node['value']
+    else:
+        for child in node['value']:
+            xml_string += get_compile_xml(child)
+    xml_string += f'</{node["type"]}>'
+    return xml_string + '\n'
+
 def process_file(file_path):
     file = open(file_path, 'r')
     tokens = get_tokens(file.read())
@@ -28,7 +38,9 @@ def process_file(file_path):
     token_output_file = open(token_output_path, 'w')
     token_output_file.write(get_token_xml(tokens))
     compilation = compile_tokens(tokens)
-    print(compilation)
+    compilation_output_path = f'{sys.argv[1]}/{filename}{OUT_FILE_EXTENSION}'
+    compilation_output_file = open(compilation_output_path, 'w')
+    compilation_output_file.write(get_compile_xml(compilation))
 
 if __name__ == '__main__':
     if os.path.isdir(sys.argv[1]):
