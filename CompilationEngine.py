@@ -27,6 +27,64 @@ def is_type(token):
         return True
     return False
 
+def compile_subroutine_body(navigator):
+    node = { 'type': 'subroutineBody', 'value': [] }
+    token = advance(navigator)
+    if token['token'] != '{':
+        raise ValueError('Expected subroutine body definition to start with {')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] == '}':
+        return node
+    def compile_var():
+        var_nodes = []
+        token = current(navigator)
+        if token['token'] != 'var':
+            return param_nodes
+        var_nodes.append({
+            'type': token['type'],
+            'value': token['token']
+        })
+        token = advance(navigator)
+        if not is_type(token):
+            raise ValueError('Expected subroutine var to have type declaration')
+        var_nodes.append({
+            'type': token['type'],
+            'value': token['token']
+        })
+        def compile_varname():
+            varname_nodes = []
+            token = advance(navigator)
+            if token['type'] != 'identifier':
+                raise ValueError('Expected varName to be an identifier')
+            varname_nodes.append({
+                'type': token['type'],
+                'value': token['token']
+            })
+            token = advance(navigator)
+            if token['token'] != ',':
+                return varname_nodes
+            varname_nodes.append({
+                'type': token['type'],
+                'value': token['token']
+            })
+            varname_nodes.extend(compile_varname())
+            return varname_nodes
+        var_nodes.extend(compile_varname())
+        token = current(navigator)
+        if token['token'] != ';':
+            raise ValueError('Expected varDec to end with ;')
+        var_nodes.append({
+          'type': token['type'],
+          'value': token['token']
+        })
+        return var_nodes
+    node['value'].extend(compile_var())
+    return node
+
 def compile_parameter_list(navigator):
     node = { 'type': 'parameterList', 'value': [] }
     token = current(navigator)
@@ -103,6 +161,7 @@ def compile_subroutine_dec(navigator):
         'type': token['type'],
         'value': token['token']
     })
+    node['value'].append(compile_subroutine_body(navigator))
     return node
 
 def compile_class(navigator):
