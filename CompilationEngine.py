@@ -81,6 +81,10 @@ def compile_subroutine_body(navigator):
           'type': token['type'],
           'value': token['token']
         })
+        token = advance(navigator)
+        if token['token'] == 'var':
+            var_nodes.extend(compile_var())
+            return var_nodes
         return var_nodes
     node['value'].extend(compile_var())
     return node
