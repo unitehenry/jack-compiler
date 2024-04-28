@@ -204,7 +204,7 @@ def compile_term(navigator):
     if token['type'] == 'identifier':
         next_token = peak(navigator)
         if next_token['token'] == '(' or next_token['token'] == '.':
-            node['value'].append(compile_subroutine_call(navigator))
+            node['value'].extend(compile_subroutine_call(navigator))
             return node
         if next_token['token'] == '[':
             token = advance(navigator)
@@ -235,46 +235,46 @@ def compile_term(navigator):
     raise ValueError(f'Unable to handle term {token["type"]} {token["token"]}')
 
 def compile_subroutine_call(navigator):
-    node = { 'type': 'subroutineCall', 'value': [] }
+    subroutine_nodes = []
     token = current(navigator)
     next_token = peak(navigator)
     if next_token['token'] == '(':
         if token['type'] != 'identifier':
             raise ValueError('Expected subroutineCall to start with identifier')
-        node['value'].append({ 'type': token['type'], 'value': token['token'] })
+        subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
         token = advance(navigator)
         if token['token'] != '(':
             raise ValueError('Expected ( in subroutineCall')
-        node['value'].append({ 'type': token['type'], 'value': token['token'] })
+        subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
         token = advance(navigator)
-        node['value'].append(compile_expession_list(navigator))
+        subroutine_nodes.append(compile_expession_list(navigator))
         token = advance(navigator)
         if token['token'] != ')':
             raise ValueError('Expected ) in subroutineCall')
-        node['value'].append({ 'type': token['type'], 'value': token['token'] })
-        return node
+        subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
+        return subroutine_nodes
     if token['type'] != 'identifier':
         raise ValueError('Expected subroutineCall to start with identifier')
-    node['value'].append({ 'type': token['type'], 'value': token['token'] })
+    subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     token = advance(navigator)
     if token['token'] != '.':
         raise ValueError('Expected subroutineCall to be followed by .')
-    node['value'].append({ 'type': token['type'], 'value': token['token'] })
+    subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     token = advance(navigator)
     if token['type'] != 'identifier':
         raise ValueError('Expected subroutineCall to be followed with identifier')
-    node['value'].append({ 'type': token['type'], 'value': token['token'] })
+    subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     token = advance(navigator)
     if token['token'] != '(':
         raise ValueError('Expected subroutineCall to be followed by (')
-    node['value'].append({ 'type': token['type'], 'value': token['token'] })
+    subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     token = advance(navigator)
-    node['value'].append(compile_expression_list(navigator))
+    subroutine_nodes.append(compile_expression_list(navigator))
     token = advance(navigator)
     if token['token'] != ')':
         raise ValueError('Expected subroutineCall to be followed by )')
-    node['value'].append({ 'type': token['type'], 'value': token['token'] })
-    return node
+    subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
+    return subroutine_nodes
 
 
 def compile_expression_list(navigator):
