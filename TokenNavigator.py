@@ -7,6 +7,9 @@ def create(tokens):
 def current(navigator):
     return navigator['tokens'][navigator['idx']]
 
+def peak(navigator):
+    return navigator['tokens'][navigator['idx'] + 1]
+
 def advance(navigator):
     navigator['idx'] += 1
     return navigator['tokens'][navigator['idx']]
