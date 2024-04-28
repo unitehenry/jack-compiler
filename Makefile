@@ -21,8 +21,8 @@ clean:
 
 .PHONY: format
 format:
-	tidy -xml -i -m test/ArrayTest/MainT.xml;
-	tidy -xml -i -m test/ArrayTest/Main.xml;
+	tidy -xml -i -m test/ArrayTest/MainT.xml &> /dev/null;
+	tidy -xml -i -m test/ArrayTest/Main.xml &> /dev/null;
 
 .PHONY: test
 test:
