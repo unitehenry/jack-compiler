@@ -69,6 +69,7 @@ def compile_var_dec(navigator):
             })
             token = advance(navigator)
             if token['token'] != ',': break
+    token = current(navigator)
     if token['token'] != ';':
         raise ValueError('Expected var declaration to end in ;')
     node['value'].append({
@@ -137,7 +138,51 @@ def compile_parameter_list(navigator):
     return node
 
 def compile_class_var_dec(navigator):
-    return None
+    node = { 'type': 'classVarDec', 'value': [] }
+    token = current(navigator)
+    if not is_class_var_dec(token):
+        raise ValueError('Expected classVarDec to be static or field')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if not is_type(token):
+        raise ValueError('Expected classVarDec to have a type')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['type'] != 'identifier':
+        raise ValueErorr('Expected classVarDec varName to be an identifier')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] == ',':
+        while has_more_tokens(navigator):
+            token = current(navigator)
+            if token['token'] != ',':
+                raise ValueError('Additional classVarDec varName should be followed by ,')
+            node['value'].append({
+                'type': token['type'],
+                'value': token['token']
+            })
+            token = advance(navigator)
+            if token['type'] != 'identifier':
+                raise ValueErorr('Expected classVarDec varName to be an identifier')
+            node['value'].append({
+                'type': token['type'],
+                'value': token['token']
+            })
+            token = advance(navigator)
+            if token['token'] != ',': break
+    token = current(navigator)
+    if token['token'] != ';':
+        raise ValueError('Expected classVarDec to end with ;')
+    return node
 
 def compile_subroutine_dec(navigator):
     node = { 'type': 'subroutineDec', 'value': [] }
