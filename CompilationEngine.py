@@ -391,6 +391,7 @@ def compile_term(navigator):
             node['value'].extend(compile_subroutine_call(navigator))
             return node
         if next_token['token'] == '[':
+            node['value'].append({ 'type': token['type'], 'value': token['token'] })
             token = advance(navigator)
             node['value'].append({ 'type': token['type'], 'value': token['token'] })
             token = advance(navigator)
