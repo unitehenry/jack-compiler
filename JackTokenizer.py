@@ -27,7 +27,9 @@ def get_token_type(token, terminal):
 def remove_comments(source_string):
     inline_comment_regex = re.compile('\/\/.+', re.IGNORECASE | re.MULTILINE)
     source_string = re.sub(inline_comment_regex, '', source_string)
-    inline_comment_regex = re.compile('\/\*(.)+\*\/', re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    inline_comment_regex = re.compile('\/\*(.)+\*\/', re.IGNORECASE | re.MULTILINE)
+    source_string = re.sub(inline_comment_regex, '', source_string)
+    inline_comment_regex = re.compile('^(\s?)(\/?)\*(.+)', re.IGNORECASE | re.MULTILINE)
     source_string = re.sub(inline_comment_regex, '', source_string)
     return source_string
 
