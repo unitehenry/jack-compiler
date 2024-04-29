@@ -190,6 +190,14 @@ def compile_expression(navigator):
     node = { 'type': 'expression', 'value': [] }
     token = current(navigator)
     node['value'].append(compile_term(navigator))
+    op_tokens = ['+', '-', '*', '/', '&', '|', '<', '>', '=']
+    if peak(navigator)['token'] in op_tokens:
+        while has_more_tokens(navigator):
+            token = advance(navigator)
+            if not token in op_tokens: break
+            node['value'].append({ 'type': token['type'], 'value': token['token'] })
+            token = advance(navigator)
+            node['value'].append(compile_term(navigator))
     return node
 
 def compile_term(navigator):
