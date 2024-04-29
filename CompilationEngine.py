@@ -270,15 +270,25 @@ def compile_subroutine_call(navigator):
     subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     token = advance(navigator)
     subroutine_nodes.append(compile_expression_list(navigator))
-    token = advance(navigator)
+    token = current(navigator)
     if token['token'] != ')':
         raise ValueError('Expected subroutineCall to be followed by )')
     subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
     return subroutine_nodes
 
-
 def compile_expression_list(navigator):
     node = { 'type': 'expressionList', 'value': [] }
+    if current(navigator)['token'] == ')':
+        advance(navigator)
+        return node
+    while has_more_tokens(navigator):
+        token = current(navigator)
+        if token['token'] == ')': break
+        if token['token'] == ',':
+            node['value'].append({ 'type': token['type'], 'value': token['token'] })
+            token = advance(navigator)
+        node['value'].append(compile_expression(navigator))
+        advance(navigator)
     return node
 
 def compile_parameter_list(navigator):
