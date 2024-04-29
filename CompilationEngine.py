@@ -30,8 +30,8 @@ def is_type(token):
 def is_statement(token):
     if token['token'] == 'let':
         return True
-    #if token['token'] == 'if':
-    #    return True
+    if token['token'] == 'if':
+        return True
     if token['token'] == 'while':
         return True
     if token['token'] == 'do':
@@ -111,7 +111,7 @@ def compile_subroutine_body(navigator):
     node['value'].append(compile_statements(navigator))
     token = current(navigator)
     if token['token'] != '}':
-        return ValueError('Expected subroutineBody to end with }')
+        raise ValueError('Expected subroutineBody to end with }')
     node['value'].append({
         'type': token['type'],
         'value': token['token']
@@ -139,7 +139,76 @@ def compile_statement(navigator):
         return compile_do_statement(navigator)
     if token['token'] == 'return':
         return compile_return_statement(navigator)
-    return { 'type': 'PLACEHOLDER', 'value': 'PLACEHOLDER' }
+    if token['token'] == 'if':
+        return compile_if_statement(navigator)
+    raise ValueError(f'Failed to handle statement {token["token"]}')
+
+def compile_if_statement(navigator):
+    node = { 'type': 'ifStatement', 'value': [] }
+    token = current(navigator)
+    if token['token'] != 'if':
+        raise ValueError('Expected statement to start with if')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != '(':
+        raise ValueError('Expected if statement to have (')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].append(compile_expression(navigator))
+    token = advance(navigator)
+    if token['token'] != ')':
+        raise ValueError('Expected if statement to have )')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != '{':
+        raise ValueError('Expected if statement to have {')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].append(compile_statements(navigator))
+    token = current(navigator)
+    if token['token'] != '}':
+        raise ValueError('If statement body should end with }')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = peak(navigator)
+    if token['token'] != 'else':
+        return node
+    token = advance(navigator)
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != '{':
+        raise ValueError('Expected else statement body to begin with {')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].append(compile_statements(navigator))
+    token = current(navigator)
+    if token['token'] != '}':
+        raise ValueError('Expected else statement to end with }')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    return node
 
 def compile_return_statement(navigator):
     node = { 'type': 'returnStatement', 'value': [] }
