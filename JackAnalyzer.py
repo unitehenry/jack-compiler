@@ -15,20 +15,27 @@ def get_token_xml(tokens):
     xml_string = '<tokens>\n'
     for token in tokens:
         xml_string += f'<{token["type"]}>'
-        xml_string += escape(token['token'])
+        xml_string += (" " + escape(token['token']) + " ")
         xml_string += f'</{token["type"]}>\n'
     xml_string += '</tokens>\n'
     return xml_string
 
-def get_compile_xml(node):
+def get_compile_xml(node, level_count=0):
     xml_string = f'<{node["type"]}>'
     if isinstance(node['value'], str):
-        xml_string += node['value']
+        xml_string += (" " + escape(node['value']) + " ")
+        xml_string += f'</{node["type"]}>'
+        return xml_string + '\n'
     else:
+        xml_string += '\n'
         for child in node['value']:
-            xml_string += get_compile_xml(child)
-    xml_string += f'</{node["type"]}>'
-    return xml_string + '\n'
+            for _ in range(level_count + 1):
+                xml_string += '  '
+            xml_string += get_compile_xml(child, level_count + 1)
+        for _ in range(level_count):
+            xml_string += '  '
+        xml_string += f'</{node["type"]}>'
+        return xml_string + '\n'
 
 def process_file(file_path):
     file = open(file_path, 'r')
@@ -36,11 +43,13 @@ def process_file(file_path):
     filename = get_filename(file_path)
     token_output_path = f'{sys.argv[1]}/{filename}T{OUT_FILE_EXTENSION}'
     token_output_file = open(token_output_path, 'w')
-    token_output_file.write(get_token_xml(tokens))
+    token_xml = get_token_xml(tokens)
+    token_output_file.write(token_xml)
     compilation = compile_tokens(tokens)
     compilation_output_path = f'{sys.argv[1]}/{filename}{OUT_FILE_EXTENSION}'
     compilation_output_file = open(compilation_output_path, 'w')
-    compilation_output_file.write(get_compile_xml(compilation))
+    compile_xml = get_compile_xml(compilation)
+    compilation_output_file.write(compile_xml)
 
 if __name__ == '__main__':
     if os.path.isdir(sys.argv[1]):

@@ -563,6 +563,10 @@ def compile_subroutine_dec(navigator):
     if not is_subroutine_dec(token):
         raise ValueError('Expected constructor, function, or method for subroutine')
     # subroutine return type
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
     token = advance(navigator)
     if not (is_type(token) or token['token'] == 'void'):
         raise ValueError('Expected a keyword or identifer for return type')
@@ -602,6 +606,10 @@ def compile_class(navigator):
     token = current(navigator)
     if token['token'] != 'class':
         raise ValueError('Expected class keyword')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
     token = advance(navigator)
     if token['type'] != 'identifier':
         raise ValueError('Expected class name identifier')
