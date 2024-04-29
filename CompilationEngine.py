@@ -34,8 +34,8 @@ def is_statement(token):
     #    return True
     if token['token'] == 'while':
         return True
-    #if token['token'] == 'do':
-    #    return True
+    if token['token'] == 'do':
+        return True
     #if token['token'] == 'return':
     #    return True
     return False
@@ -135,7 +135,29 @@ def compile_statement(navigator):
         return compile_let_statement(navigator)
     if token['token'] == 'while':
         return compile_while_statement(navigator)
+    if token['token'] == 'do':
+        return compile_do_statement(navigator)
     return { 'type': 'PLACEHOLDER', 'value': 'PLACEHOLDER' }
+
+def compile_do_statement(navigator):
+    node = { 'type': 'doStatement', 'value': [] }
+    token = current(navigator)
+    if token['token'] != 'do':
+        raise ValueError('Expected statement to start with do')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].extend(compile_subroutine_call(navigator))
+    token = advance(navigator)
+    if token['token'] != ';':
+        raise ValueError('Expected do statement to end with ;')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    return node
 
 def compile_while_statement(navigator):
     node = { 'type': 'whileStatement', 'value': [] }
@@ -346,7 +368,6 @@ def compile_subroutine_call(navigator):
 def compile_expression_list(navigator):
     node = { 'type': 'expressionList', 'value': [] }
     if current(navigator)['token'] == ')':
-        advance(navigator)
         return node
     while has_more_tokens(navigator):
         token = current(navigator)
