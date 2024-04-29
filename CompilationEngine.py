@@ -32,8 +32,8 @@ def is_statement(token):
         return True
     #if token['token'] == 'if':
     #    return True
-    #if token['token'] == 'while':
-    #    return True
+    if token['token'] == 'while':
+        return True
     #if token['token'] == 'do':
     #    return True
     #if token['token'] == 'return':
@@ -133,7 +133,52 @@ def compile_statement(navigator):
     token = current(navigator)
     if token['token'] == 'let':
         return compile_let_statement(navigator)
+    if token['token'] == 'while':
+        return compile_while_statement(navigator)
     return { 'type': 'PLACEHOLDER', 'value': 'PLACEHOLDER' }
+
+def compile_while_statement(navigator):
+    node = { 'type': 'whileStatement', 'value': [] }
+    token = current(navigator)
+    if token['token'] != 'while':
+        raise ValueError('Expected statement to start with while')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != '(':
+        raise ValueError('While statement should start with (')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].append(compile_expression(navigator))
+    token = advance(navigator)
+    if token['token'] != ')':
+        raise ValueError('While statement expression should end with )')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != '{':
+        raise ValueError('While statement body should start with {')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    node['value'].append(compile_statements(navigator))
+    token = current(navigator)
+    if token['token'] != '}':
+        raise ValueError('While statement body should end with }')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    return node
 
 def compile_let_statement(navigator):
     node = { 'type': 'letStatement', 'value': [] }
@@ -167,7 +212,21 @@ def compile_let_statement(navigator):
             'value': token['token']
         })
         return node
+    if token['token'] != '[':
+        raise ValueError('Expected let statement to be followed by [')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
     node['value'].append(compile_expression(navigator))
+    token = advance(navigator)
+    if token['token'] != ']':
+        raise ValueError('Expected let statement to be followed by ]')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
     token = advance(navigator)
     if token['token'] != '=':
         raise ValueError('Expected let statement to have =')
@@ -193,8 +252,8 @@ def compile_expression(navigator):
     op_tokens = ['+', '-', '*', '/', '&', '|', '<', '>', '=']
     if peak(navigator)['token'] in op_tokens:
         while has_more_tokens(navigator):
+            if not peak(navigator)['token'] in op_tokens: break
             token = advance(navigator)
-            if not token in op_tokens: break
             node['value'].append({ 'type': token['type'], 'value': token['token'] })
             token = advance(navigator)
             node['value'].append(compile_term(navigator))
