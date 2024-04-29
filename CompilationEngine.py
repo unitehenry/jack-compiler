@@ -431,8 +431,8 @@ def compile_subroutine_call(navigator):
             raise ValueError('Expected ( in subroutineCall')
         subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })
         token = advance(navigator)
-        subroutine_nodes.append(compile_expession_list(navigator))
-        token = advance(navigator)
+        subroutine_nodes.append(compile_expression_list(navigator))
+        token = current(navigator)
         if token['token'] != ')':
             raise ValueError('Expected ) in subroutineCall')
         subroutine_nodes.append({ 'type': token['type'], 'value': token['token'] })

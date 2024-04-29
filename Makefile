@@ -23,7 +23,14 @@ clean:
 format:
 	tidy -xml -i -m test/ArrayTest/MainT.xml &> /dev/null;
 	tidy -xml -i -m test/ArrayTest/Main.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/MainT.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/Main.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/SquareT.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/Square.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/SquareGameT.xml &> /dev/null;
+	tidy -xml -i -m test/ExpressionLessSquare/SquareGame.xml &> /dev/null;
 
 .PHONY: test
 test:
 	./JackAnalyzer test/ArrayTest
+	./JackAnalyzer test/ExpressionLessSquare
