@@ -36,8 +36,8 @@ def is_statement(token):
         return True
     if token['token'] == 'do':
         return True
-    #if token['token'] == 'return':
-    #    return True
+    if token['token'] == 'return':
+        return True
     return False
 
 def compile_var_dec(navigator):
@@ -110,12 +110,12 @@ def compile_subroutine_body(navigator):
             break
     node['value'].append(compile_statements(navigator))
     token = current(navigator)
-    #if token['token'] != '}':
-    #    return ValueError('Expected subroutineBody to end with }')
-    #node['value'].append({
-    #    'type': token['type'],
-    #    'value': token['token']
-    #})
+    if token['token'] != '}':
+        return ValueError('Expected subroutineBody to end with }')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
     return node
 
 def compile_statements(navigator):
@@ -137,7 +137,33 @@ def compile_statement(navigator):
         return compile_while_statement(navigator)
     if token['token'] == 'do':
         return compile_do_statement(navigator)
+    if token['token'] == 'return':
+        return compile_return_statement(navigator)
     return { 'type': 'PLACEHOLDER', 'value': 'PLACEHOLDER' }
+
+def compile_return_statement(navigator):
+    node = { 'type': 'returnStatement', 'value': [] }
+    token = current(navigator)
+    if token['token'] != 'return':
+        raise ValueError('Expected statement to start with return')
+    node['value'].append({
+        'type': token['type'],
+        'value': token['token']
+    })
+    token = advance(navigator)
+    if token['token'] != ';':
+        node['value'].append(compile_expression(navigator))
+        token = advance(navigator)
+        if token['token'] != ';':
+            raise ValueError('Expected return statement to end with ;')
+        return node
+    if token['token'] == ';':
+        node['value'].append({
+            'type': token['type'],
+            'value': token['token']
+        })
+        return node
+    raise ValueError('Failed to compile return statement')
 
 def compile_do_statement(navigator):
     node = { 'type': 'doStatement', 'value': [] }
